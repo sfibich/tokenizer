@@ -49,9 +49,7 @@ class TestTokenier(unittest.TestCase):
         value = "Whatever2"
         t = Token(value)
         token = t.get_token_from_store()
-        t2 = Token(value)
-        token2 = t2.get_token_from_store()
-        self.assertEqual(token,token2)
+        self.assertIsNone(token)
 
     def test_write_token(self):
         value = "Whatever3"
@@ -69,6 +67,8 @@ class TestTokenier(unittest.TestCase):
         t.write_token_to_store()
         try:
             token = Token.tokens[t.key]
+            print(t.write_token())
+            print(type(token))
         except KeyError:
             self.fail("no token")
 
