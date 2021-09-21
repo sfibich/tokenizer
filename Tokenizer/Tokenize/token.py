@@ -10,16 +10,9 @@ class Token():
     def __init__(self,value):
         self.raw_value=value
         self.key = self.get_key()
-        self.token = self.get_token_from_store()
         self.token_value = self.get_token_value()
-        if (self.token is None):
-            self.token_value = self.get_token_value()
-            self.token = self.write_token()
-            self.write_token_to_store()
-        #    #put into store
-        else:
-            pass
-        #    #self.token_value = self.token["token_value"]
+        self.token = self.write_token()
+        self.write_token_to_store()
 
     def write_token_to_store(self):
         Token.tokens[self.key] = self.token
@@ -44,21 +37,19 @@ class Token():
         return m.hexdigest()
 
     def get_token_value(self):
-        '''
-        Get length of raw value
-        if numeric only ; give numeric  token back
-        if alph give alpha back
-        ss is future
-        give back the same length string
-        '''
 
-        possible_values = ascii_letters
-        if self.raw_value.isnumeric():
-            possible_values = digits
-        else:
+        self.token = self.get_token_from_store()
+        if (self.token is None):
             possible_values = ascii_letters
+            if self.raw_value.isnumeric():
+                possible_values = digits
+            else:
+                possible_values = ascii_letters
 
-        token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
+            token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
+        else:
+            token_value = json.loads(self.token)["token_value"]
+
         return token_value
 
     def get_raw_value_length(self):
