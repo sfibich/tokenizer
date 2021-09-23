@@ -15,6 +15,14 @@
       "type": "http",
       "direction": "out",
       "name": "$return"
+    },
+ 	{
+      "name": "outputblob",
+      "type": "blob",
+      "dataType": "binary",
+      "path": "tokens/test.json",
+      "connection": "MyStorageConnectionAppSetting",
+      "direction": "out"
     }
   ]
 }
