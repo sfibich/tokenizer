@@ -57,8 +57,11 @@ class TestTokenier(unittest.TestCase):
         value = "Whatever3"
         t = Token(value)
         expected_token = {
+                "partitionKey":"TestCustomer",
+                "rowKey":t.key,
                 "token_value":t.token_value,
-                "raw_value": value
+                "raw_value": value,
+                "keyType": 1
                 }
         token = t.write_token()
         self.assertEqual(token,json.dumps(expected_token))

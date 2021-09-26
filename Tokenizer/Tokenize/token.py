@@ -19,8 +19,11 @@ class Token():
 
     def write_token(self):
         token = {
+                "partitionKey": "TestCustomer",
+                "rowKey":self.key,
                 "token_value": self.token_value,
                 "raw_value":self.raw_value,
+                "keyType":1,
                 }
         return json.dumps(token)
 
