@@ -1,9 +1,16 @@
 import unittest
 import json
+import os
 
 from Tokenize.token import Token
 
 class TestTokenier(unittest.TestCase):
+
+    def setUp(self):
+        f=open("local.settings.json",)
+        settingJson=json.load(f)
+        os.environ["accountName"]=settingJson["Values"]["accountName"]
+        os.environ["accountKey"]=settingJson["Values"]["accountKey"]
 
     def test_token_constructor(self):
         test_value = 'Test String'
@@ -64,6 +71,19 @@ class TestTokenier(unittest.TestCase):
                 "keyType": 1
                 }
         token = t.write_token()
+        self.assertEqual(token,json.dumps(expected_token))
+
+    def test_write_token2(self):
+        value = "Whatever3.5"
+        t = Token(value)
+        expected_token = {
+                "partitionKey":"TestCustomer",
+                "rowKey":t.token_value,
+                "key":t.key,
+                "raw_value": value,
+                "keyType": 2
+                }
+        token = t.write_token2()
         self.assertEqual(token,json.dumps(expected_token))
 
     def test_write_token_to_store(self):

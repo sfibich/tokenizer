@@ -21,6 +21,6 @@ def main(req: func.HttpRequest, message: func.Out[str]) -> func.HttpResponse:
         return func.HttpResponse(t.token)
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+             "This HTTP triggered function executed successfully. Please passa value to tokenize.",
              status_code=200
         )
