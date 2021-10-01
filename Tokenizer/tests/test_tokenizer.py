@@ -11,6 +11,7 @@ class TestTokenier(unittest.TestCase):
         settingJson=json.load(f)
         os.environ["accountName"]=settingJson["Values"]["accountName"]
         os.environ["accountKey"]=settingJson["Values"]["accountKey"]
+        f.close()
 
     def test_token_constructor(self):
         test_value = 'Test String'
@@ -85,16 +86,6 @@ class TestTokenier(unittest.TestCase):
                 }
         token = t.write_token2()
         self.assertEqual(token,json.dumps(expected_token))
-
-    def test_write_token_to_store(self):
-        value = "Whatever4"
-        t = Token(value)
-        t.write_token_to_store()
-        try:
-            token = Token.tokens[t.key]
-        except KeyError:
-            self.fail("no token")
-
 
 if __name__ == "__main__":
     unittest.main()

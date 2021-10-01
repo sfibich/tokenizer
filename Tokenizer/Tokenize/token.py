@@ -21,11 +21,6 @@ class Token():
         self.key = self.get_key()
         self.token_value = self.get_token_value()
         self.token = self.write_token()
-        self.write_token_to_store()
-
-    def write_token_to_store(self):
-        #Token.tokens[self.key] = self.token
-        pass
 
     def write_token(self):
         token = {
@@ -50,10 +45,10 @@ class Token():
     def get_token_from_store(self):
         try:
             token1 = self.table_service.get_entity('test', self.customer,self.key)
-            token=token1.rowKey
+            token_value=token1.token_value
         except AzureMissingResourceHttpError:
-            token = None
-        return token
+            token_value = None
+        return token_value
 
     def get_key(self):
         m = hashlib.sha256()
@@ -62,8 +57,8 @@ class Token():
 
     def get_token_value(self):
 
-        self.token = self.get_token_from_store()
-        if (self.token is None):
+        token_value = self.get_token_from_store()
+        if (token_value is None):
             possible_values = ascii_letters
             if self.raw_value.isnumeric():
                 possible_values = digits
@@ -72,7 +67,7 @@ class Token():
 
             token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
         else:
-            token_value = json.loads(self.token)["token_value"]
+            token_value = token_value
 
         return token_value
 
