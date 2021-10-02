@@ -8,37 +8,42 @@ from string import digits
 from azure.cosmosdb.table.tableservice import TableService
 from azure.cosmosdb.table.models import Entity
 
-
 class Token():
     tokens = {}
 
-    def __init__(self,value):
+    def __init__(self,value,customer):
         account_name=os.environ["accountName"]
         account_key=os.environ["accountKey"]
         self.table_service = TableService(account_name=account_name, account_key=account_key)
         self.raw_value=value
-        self.customer="TestCustomer"
+        self.customer=customer
         self.key = self.get_key()
         self.token_value = self.get_token_value()
-        self.token = self.write_token()
 
-    def write_token(self):
+    def write_token_to_store(self):
+        self.table_service.insert_entity('test',json.loads(self.token))
+        pass
+
+    def write_token2_to_store(self):
+        pass
+
+    def write_token(self, token_value:str) -> str:
         token = {
-                "partitionKey": self.customer,
-                "rowKey":self.key,
-                "token_value": self.token_value,
-                "raw_value":self.raw_value,
-                "keyType":1
+                "PartitionKey": self.customer,
+                "RowKey":self.key,
+                "TokenValue": token_value,
+                "RawValue":self.raw_value,
+                "KeyType":1
                 }
         return json.dumps(token)
 
-    def write_token2(self):
+    def write_token2(self, token_value:str) -> str:
         token = {
-                "partitionKey": self.customer,
-                "rowKey":self.token_value,
-                "key": self.key,
-                "raw_value":self.raw_value,
-                "keyType":2
+                "PartitionKey": self.customer,
+                "RowKey":token_value,
+                "Key": self.key,
+                "RawValue":self.raw_value,
+                "KeyType":2
                 }
         return json.dumps(token)
 
@@ -66,6 +71,9 @@ class Token():
                 possible_values = ascii_letters
 
             token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
+            self.token = self.write_token(token_value)
+            self.write_token_to_store()
+#           self.write_token2_to_store()
         else:
             token_value = token_value
 

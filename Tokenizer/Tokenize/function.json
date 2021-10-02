@@ -15,14 +15,6 @@
       "type": "http",
       "direction": "out",
       "name": "$return"
-    },
-     {
-      "name": "message",
-      "type": "table",
-      "tableName": "test",
-      "partitionKey": "customer_key",
-      "connection": "MyStorageConnectionAppSetting",
-      "direction": "out"
     }
-  ]
+	]
 }
