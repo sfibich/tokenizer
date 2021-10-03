@@ -24,10 +24,9 @@ class Token():
 
     def write_token_to_store(self):
         self.table_service.insert_entity(self.key_table,json.loads(self.token))
-        pass
 
     def write_token2_to_store(self):
-        pass
+        self.table_service.insert_entity(self.token_table,json.loads(self.token2))
 
     def write_token(self, token_value:str) -> str:
         token = {
@@ -75,8 +74,9 @@ class Token():
             token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
             #need to test to see if token does not exist for customer...assume no for now.
             self.token = self.write_token(token_value)
+            self.token2 = self.write_token2(token_value)
             self.write_token_to_store()
-#           self.write_token2_to_store()
+            self.write_token2_to_store()
         else:
             token_value = token_value
 
