@@ -14,6 +14,8 @@ class Token():
     def __init__(self,value,customer):
         account_name=os.environ["accountName"]
         account_key=os.environ["accountKey"]
+        self.key_table = "Key"
+        self.token_table = "Token"
         self.table_service = TableService(account_name=account_name, account_key=account_key)
         self.raw_value=value
         self.customer=customer
@@ -21,7 +23,7 @@ class Token():
         self.token_value = self.get_token_value()
 
     def write_token_to_store(self):
-        self.table_service.insert_entity('test',json.loads(self.token))
+        self.table_service.insert_entity(self.key_table,json.loads(self.token))
         pass
 
     def write_token2_to_store(self):
@@ -49,8 +51,8 @@ class Token():
 
     def get_token_from_store(self):
         try:
-            token1 = self.table_service.get_entity('test', self.customer,self.key)
-            token_value=token1.token_value
+            token1 = self.table_service.get_entity(self.key_table, self.customer,self.key)
+            token_value=token1.TokenValue
         except AzureMissingResourceHttpError:
             token_value = None
         return token_value
@@ -71,6 +73,7 @@ class Token():
                 possible_values = ascii_letters
 
             token_value = ''.join(random.choice(possible_values) for _ in range(self.get_raw_value_length()))
+            #need to test to see if token does not exist for customer...assume no for now.
             self.token = self.write_token(token_value)
             self.write_token_to_store()
 #           self.write_token2_to_store()

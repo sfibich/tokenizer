@@ -17,6 +17,7 @@ class TestTokenier(unittest.TestCase):
         test_value = 'Test String'
         t = Token(test_value,"TestCustomer")
         self.assertEqual(t.raw_value,test_value)
+        del t
 
     def test_token_get_token_not_equal(self):
         value = 'Here We Go'
