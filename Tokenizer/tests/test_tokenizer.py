@@ -1,6 +1,7 @@
 import unittest
 import json
 import os
+from azure.common import AzureConflictHttpError
 
 from Tokenize.token import Token
 
@@ -14,79 +15,52 @@ class TestTokenier(unittest.TestCase):
         f.close()
 
     def test_token_constructor(self):
-        test_value = 'Test String'
+        test_value = 'Test8String'
         t = Token(test_value,"TestCustomer")
         self.assertEqual(t.raw_value,test_value)
-        del t
+        self.assertEqual(t.customer,"TestCustomer")
 
-    def test_token_get_token_not_equal(self):
-        value = 'Here We Go'
-        t = Token(value,"TestCustomer")
-        self.assertNotEqual(t.get_token_value(),value)
+    def test_get_key(self):
+        test_value = 'Test8String'
+        t= Token(test_value,"t22")
+        self.assertEqual(t.get_key(),"10facb75247755cd13c2a292191c7d9e8e815287619e3491bb30c31e7057c198")
 
-    def test_token_get_token_length(self):
-        value = 'Here We Go'
-        t= Token(value,"TestCustomer")
-        self.assertEqual(t.get_token_value_length(),len(value))
+    def test_get_token_from_store_none(self):
+        test_value = 'Test9String'
+        t= Token(test_value,"TestCustomer")
+        token_value= t.get_token_from_store()
+        self.assertIsNone(token_value)
 
-    def test_token_get_token_isnumeric(self):
-        value ="12345"
-        t =Token(value,"TestCustomer")
-        token_value = t.get_token_value()
-        self.assertTrue(token_value.isnumeric())
+    def test_get_token_from_store_true(self):
+        test_value = 'Test10String'
+        t=Token(test_value,"TestCustomer")
+        from azure.cosmosdb.table.tableservice import TableService
+        from azure.cosmosdb.table.models import Entity
 
-    def test_token_get_token_string_is_numeric(self):
-        value = "Whatever"
-        t = Token(value,"TestCustomer")
-        token_value = t.get_token_value()
-        self.assertFalse(token_value.isnumeric())
-
-    def test_token_get_token_same_token_same_value(self):
-        value = "Whatever"
-        t = Token(value,"TestCustomer")
-        token_value = t.get_token_value()
-        token_value_2 = t.get_token_value()
-        self.assertEqual(token_value,token_value_2)
-
-    def test_token_get_key(self):
-        value = "Whatever"
-        t = Token(value,"TestCustomer")
-        t2 = Token(value,"TestCustomer")
-        self.assertEqual(t.get_key(), t2.get_key())
-
-    def test_no_value_in_store(self):
-        value = "Whatever2"
-        t = Token(value,"TestCustomer")
-        token = t.get_token_from_store()
-        t2 = Token(value,"TestCustomer")
-        token2 = t2.get_token_from_store()
-        self.assertEqual(token,token2)
-
-    def test_write_token(self):
-        value = "Whatever3"
-        t = Token(value,"TestCustomer")
-        expected_token = {
-                "PartitionKey":"TestCustomer",
-                "RowKey":t.key,
-                "TokenValue":t.token_value,
-                "RawValue": value,
-                "KeyType": 1
+        account_name=os.environ["accountName"]
+        account_key=os.environ["accountKey"]
+        key_table = "Key"
+        token_table = "Token"
+        table_service = TableService(account_name=account_name, account_key=account_key)
+        token = {
+                "PartitionKey": t.customer,
+                "RowKey": t.get_key(),
+                "TokenValue": "TEST",
+                "RawValue":t.raw_value,
+                "KeyType":1
                 }
-        token = t.write_token(t.token_value)
-        self.assertEqual(token,json.dumps(expected_token))
-    '''
-    def test_write_token2(self):
-        value = "Whatever3.5"
-        t = Token(value)
-        expected_token = {
-                "partitionKey":"TestCustomer",
-                "rowKey":t.token_value,
-                "key":t.key,
-                "raw_value": value,
-                "keyType": 2
-                }
-        token = t.write_token2(t.token_value)
-        self.assertEqual(token,json.dumps(expected_token))
-    '''
+        token_string=json.dumps(token)
+        try:
+            table_service.insert_entity(key_table,json.loads(token_string))
+        except AzureConflictHttpError:
+            pass
+
+        token_actual = t.get_token_from_store()
+        ## CLEAN UP ##
+        table_service.delete_entity(key_table, t.customer, t.get_key())
+
+        self.assertEqual(token_actual,token["TokenValue"])
+
+
 if __name__ == "__main__":
     unittest.main()

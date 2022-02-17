@@ -3,7 +3,7 @@ import logging
 import azure.functions as func
 from Tokenize.token import Token
 
-def main(req: func.HttpRequest, message: func.Out[str]) -> func.HttpResponse:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     value = req.params.get('value')
@@ -17,7 +17,6 @@ def main(req: func.HttpRequest, message: func.Out[str]) -> func.HttpResponse:
 
     if value:
         t = Token(value)
-        message.set(t.token)
         return func.HttpResponse(t.token)
     else:
         return func.HttpResponse(
